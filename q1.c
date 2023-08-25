@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #define NUM_THREADS_CASO1 10 
 #define NUM_THREADS_CASO2 5
 #define NUM_THREADS_CASO3 1  
@@ -27,7 +28,7 @@ void *findChar2(void *threadid){
         if(tid.comparador == senha[tid.char_t]){
             decode2[tid.char_t] = tid.comparador;
             flag = 1;
-            printf("caracter %d achado pela thread %d\n\n", tid.char_t, tid.thread_id);
+            printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
             count++;
         }
         x++;
@@ -43,7 +44,7 @@ void *findChar2(void *threadid){
         if(tid.comparador == senha[tid.char_t]){
             decode2[tid.char_t] = tid.comparador;
             flag = 1;
-            printf("caracter %d achado pela thread %d\n\n", tid.char_t, tid.thread_id);
+            printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
             count++;
         }
         x++;
@@ -63,7 +64,7 @@ void *findChar1(void *threadid){
         if(tid.comparador == senha[tid.char_t]){
             decode1[tid.char_t] = tid.comparador;
             flag = 1;
-            printf("caracter %d achado pela thread %d\n\n", tid.char_t, tid.thread_id);
+            printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
             count++;
         }
         x++;
@@ -73,6 +74,27 @@ void *findChar1(void *threadid){
     pthread_exit(NULL);
 }
 
+
+void *findChar3(void *threadid){   
+    for(int i=0; i<10; i++){
+        T tid = *((T *)threadid);
+        int flag = 0, x = 33;
+        tid.char_t = i;
+        for(; tid.comparador || flag == 0;){
+            tid.comparador = x;
+            if(tid.comparador == senha[tid.char_t]){
+                decode3[tid.char_t] = tid.comparador;
+                flag = 1;
+                printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
+                count++;
+            }
+            x++;
+        }
+        
+        flag = 0;
+    }
+    pthread_exit(NULL);
+}
 
 int main (int argc, char *argv[]){
     int rc;   
@@ -100,6 +122,9 @@ int main (int argc, char *argv[]){
         pthread_join(threads1[t], NULL);
     }
     
+    long int cycles = clock();
+    long int ex_time = cycles/ CLOCKS_PER_SEC;
+    printf("%ld\n\n", ex_time);
   
    printf("%s\n\n", decode1);
    
@@ -126,7 +151,31 @@ int main (int argc, char *argv[]){
         pthread_join(threads2[t], NULL);
     }
     
-    printf("%s\n\n", decode2);
+    printf("%s\n\n", decode3);
+    
+    printf("Caso 2 (5 threads):\n\n");
+    
+    T *taskids3[NUM_THREADS_CASO3];
+    pthread_t threads3[NUM_THREADS_CASO3];
+    decode3[10] = '\0';
+    
+    for(t=0; t<NUM_THREADS_CASO3; t++){   
+        
+        taskids3[t] = (T *) malloc(sizeof(T)); 
+        taskids3[t]->thread_id = t;
+        
+        rc = pthread_create(&threads3[t], NULL, &findChar3, (void *) taskids3[t]);      
+        if (rc){         
+            printf("ERRO; código de retorno é %d\n", rc);         
+            exit(-1);      
+        }   
+    }
+    
+    for(t=0; t<NUM_THREADS_CASO3; t++){
+        pthread_join(threads3[t], NULL);
+    }
+    
+    printf("%s\n\n", decode3);
   
     pthread_exit(NULL);
 }
