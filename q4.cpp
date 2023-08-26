@@ -48,12 +48,6 @@ void solve(int **map_, int lim_x, int lim_y){
 
                     if(ceil_adj_x >= 0 && ceil_adj_x < lim_x && ceil_adj_y >= 0 && ceil_adj_y < lim_y){
                         if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
-                            // ii me = dsFind(x,y);
-                            // ii ceil_adj = dsFind(ceil_adj_x,ceil_adj_y);
-
-                            // if(me.first != ceil_adj.first || me.second != ceil_adj.second){
-                            //     dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
-                            // }
                             dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
                         }
                     }
