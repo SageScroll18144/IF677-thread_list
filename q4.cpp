@@ -1,11 +1,13 @@
 #include <bits/stdc++.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
 #define ii pair<int, int>
 
-const int maxn = 1e3+10; //max map's size
+const int maxn = 110; //max map_'s size
 ii ds[maxn][maxn];//set of fathers
 int adj_x[] = {0,0,-1,1};
 int adj_y[] = {1,-1,0,0};
@@ -36,22 +38,23 @@ void dsUnion(ii u, ii v){
     ds[v.first][v.second] = u;
 }
 
-void solve(int **map, int lim_x, int lim_y){
+void solve(int **map_, int lim_x, int lim_y){
     for (int x = 0; x < lim_x; x++){
         for (int y = 0; y < lim_y; y++){
-            if(map[x][y]){ //se for terra
+            if(map_[x][y]){ //se for terra
                 for(int adj = 0; adj < 4; adj++){
                     int ceil_adj_x = x + adj_x[adj];
                     int ceil_adj_y = y + adj_y[adj]; 
 
                     if(ceil_adj_x >= 0 && ceil_adj_x < lim_x && ceil_adj_y >= 0 && ceil_adj_y < lim_y){
-                        if(map[ceil_adj_x][ceil_adj_y]){//se for terra
-                            ii me = dsFind(x,y);
-                            ii ceil_adj = dsFind(ceil_adj_x,ceil_adj_y);
+                        if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
+                            // ii me = dsFind(x,y);
+                            // ii ceil_adj = dsFind(ceil_adj_x,ceil_adj_y);
 
-                            if(me.first != ceil_adj.first || me.second != ceil_adj.second){
-                                dsUnion(me, ceil_adj);
-                            }
+                            // if(me.first != ceil_adj.first || me.second != ceil_adj.second){
+                            //     dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
+                            // }
+                            dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
                         }
                     }
                 }
@@ -62,9 +65,47 @@ void solve(int **map, int lim_x, int lim_y){
     
 }
 
+int counter_fathers(int **map_, int lim_x, int lim_y){
+    bool mark[lim_x][lim_y];
+    memset(mark, false, sizeof(mark));
+
+    for (int i = 0; i < lim_x; i++){
+        for (int j = 0; j < lim_y; j++){
+            ii dad = dsFind(i, j);
+            if(map_[dad.first][dad.second]) mark[dad.first][dad.second] = true;
+        }
+    }  
+    int counter_fathers = 0;
+    for (int i = 0; i < lim_x; i++){
+        for (int j = 0; j < lim_y; j++){
+            if(mark[i][j]) counter_fathers++;
+        }
+    }
+
+    return counter_fathers;
+}
+
 int main(){
-    int N;
-    int map[N][N];
+    dsBuild();
+
+    int lim_x, lim_y;
+    scanf("%d%d", &lim_x, &lim_y);
+
+    int **map_ = (int **) malloc(lim_x * sizeof(int *));
+    char component;
+    for (int i = 0; i < lim_x; i++){
+        map_[i] = (int *) malloc(lim_y * sizeof(int));
+        for (int j = 0; j < lim_y; j++){
+            scanf(" %c", &component);
+            map_[i][j] = component - '0';
+        }
+    } 
+
+    solve(map_, lim_x, lim_y);
+    printf("%d\n", counter_fathers(map_, lim_x, lim_y));
+
+    for(int i = 0; i < lim_x; i++) free(map_[i]);
+    free(map_);
 
     return 0;
 }
