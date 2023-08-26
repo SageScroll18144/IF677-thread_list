@@ -1,17 +1,23 @@
 #include <bits/stdc++.h>
+#include <pthread.h>
 
 using namespace std;
 
-const int maxn = 1e3+10; //pior caso
+typedef struct{
+    int ID;
 
-vector<int> graph[maxn];
+}process;
+
+const int maxn = 110;
+
+vector<process> graph[maxn];
 bool visited[maxn];
 
-bool DFS_find_cycle(int node){
-    visited[node] = true;
-    for(auto son : graph[node]){
-        if(!visited[son]) DFS_find_cycle(son);
-        else if(visited[son]) return true;
+bool DFS_find_cycle(process node){
+    visited[node.ID] = true;
+    for(auto son : graph[node.ID]){
+        if(!visited[son.ID]) DFS_find_cycle(son);
+        else if(visited[son.ID]) return true;
     }
     return false;
 }
