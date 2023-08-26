@@ -1,7 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <ctime>
 #define NUM_THREADS_CASO1 10 
 #define NUM_THREADS_CASO2 5
 #define NUM_THREADS_CASO3 1  
@@ -98,9 +98,12 @@ void *findChar3(void *threadid){
 
 int main (int argc, char *argv[]){
     int rc;   
-    int t;   
+    int t;
+    double time1, time2, time3, exec;
     
     printf("Caso 1 (10 threads):\n\n");
+    
+    clock_t comeco1 = clock();
     
     T *taskids1[NUM_THREADS_CASO1];
     pthread_t threads1[NUM_THREADS_CASO1];
@@ -122,14 +125,18 @@ int main (int argc, char *argv[]){
         pthread_join(threads1[t], NULL);
     }
     
-    long int cycles = clock();
-    long int ex_time = cycles/ CLOCKS_PER_SEC;
-    printf("%ld\n\n", ex_time);
+    clock_t fim1 = clock();
+    
+    time1 = (double) (fim1 - comeco1)/CLOCKS_PER_SEC;
+    
+    printf("%0.7f\n\n", time1);
   
    printf("%s\n\n", decode1);
    
    
    printf("Caso 2 (5 threads):\n\n");
+   
+   clock_t comeco2 = clock();
     
     T *taskids2[NUM_THREADS_CASO2];
     pthread_t threads2[NUM_THREADS_CASO2];
@@ -151,9 +158,17 @@ int main (int argc, char *argv[]){
         pthread_join(threads2[t], NULL);
     }
     
+    clock_t fim2 = clock();
+    
+    time2 = (double) (fim2 - comeco2)/CLOCKS_PER_SEC;
+    
+    printf("%0.7f\n\n", time2);
+    
     printf("%s\n\n", decode3);
     
-    printf("Caso 2 (5 threads):\n\n");
+    printf("Caso 3 (1 threads):\n\n");
+    
+    clock_t comeco3 = clock();
     
     T *taskids3[NUM_THREADS_CASO3];
     pthread_t threads3[NUM_THREADS_CASO3];
@@ -175,7 +190,15 @@ int main (int argc, char *argv[]){
         pthread_join(threads3[t], NULL);
     }
     
+    clock_t fim3 = clock();
+    
+    time3 = (double) (fim3 - comeco3)/CLOCKS_PER_SEC;
+    
     printf("%s\n\n", decode3);
+    
+    printf("tempo de execucao 10 threads : %0.7f\n\n", time1);
+    printf("tempo de execucao 5 threads : %0.7f\n\n", time2);
+    printf("tempo de execucao 1 thread : %0.7f\n\n", time3);
   
     pthread_exit(NULL);
 }
