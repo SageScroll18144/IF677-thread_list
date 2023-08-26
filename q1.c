@@ -1,7 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <ctime>
+#include <time.h>
 #define NUM_THREADS_CASO1 10 
 #define NUM_THREADS_CASO2 5
 #define NUM_THREADS_CASO3 1  
