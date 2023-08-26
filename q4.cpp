@@ -88,8 +88,12 @@ int counter_fathers(int **map_, int lim_x, int lim_y){
 int main(){
     dsBuild();
 
+    printf("- Informe o número de linhas e colunas: ");
+
     int lim_x, lim_y;
     scanf("%d%d", &lim_x, &lim_y);
+
+    printf("- Informe a imagem do mapa:\n");
 
     int **map_ = (int **) malloc(lim_x * sizeof(int *));
     char component;
@@ -101,6 +105,11 @@ int main(){
         }
     } 
 
+    int N;
+    printf("Informe o número N de Threads: ");
+    scanf("%d", &N);
+
+
     solve(map_, lim_x, lim_y);
     printf("%d\n", counter_fathers(map_, lim_x, lim_y));
 
@@ -109,3 +118,17 @@ int main(){
 
     return 0;
 }
+
+/*
+    Exemplo de entrada:
+
+    - Informe o número de linhas e colunas: 5 7
+    - Informe a imagem do mapa:
+    1111000
+    1110000
+    0000100
+    0000011
+    0000111
+    Informe o número N de Threads: 5
+
+*/
