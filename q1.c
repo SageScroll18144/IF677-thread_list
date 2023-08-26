@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#define NUM_THREADS_CASO1 10 
-#define NUM_THREADS_CASO2 5
-#define NUM_THREADS_CASO3 1  
+#define n_threads_caso1 10 
+#define n_threads_caso2 5
+#define n_threads_caso3 1  
 
 int count;
 char decode1[11];
@@ -96,32 +96,32 @@ void *findChar3(void *threadid){
     pthread_exit(NULL);
 }
 
-int main (int argc, char *argv[]){
+int main (){
     int rc;   
     int t;
-    double time1, time2, time3, exec;
+    double time1, time2, time3;
     
     printf("Caso 1 (10 threads):\n\n");
     
     clock_t comeco1 = clock();
     
-    T *taskids1[NUM_THREADS_CASO1];
-    pthread_t threads1[NUM_THREADS_CASO1];
+    T *task1[n_threads_caso1];
+    pthread_t threads1[n_threads_caso1];
     decode1[10] = '\0';
     
-    for(t=0; t<NUM_THREADS_CASO1; t++){   
+    for(t=0; t<n_threads_caso1; t++){   
         
-        taskids1[t] = (T *) malloc(sizeof(T)); 
-        taskids1[t]->thread_id = t;
+        task1[t] = (T *) malloc(sizeof(T)); 
+        task1[t]->thread_id = t;
         
-        rc = pthread_create(&threads1[t], NULL, &findChar1, (void *) taskids1[t]);      
+        rc = pthread_create(&threads1[t], NULL, &findChar1, (void *) task1[t]);      
         if (rc){         
             printf("ERRO; código de retorno é %d\n", rc);         
             exit(-1);      
         }   
     }
     
-    for(t=0; t<NUM_THREADS_CASO1; t++){
+    for(t=0; t<n_threads_caso1; t++){
         pthread_join(threads1[t], NULL);
     }
     
@@ -138,23 +138,23 @@ int main (int argc, char *argv[]){
    
    clock_t comeco2 = clock();
     
-    T *taskids2[NUM_THREADS_CASO2];
-    pthread_t threads2[NUM_THREADS_CASO2];
+    T *task2[n_threads_caso2];
+    pthread_t threads2[n_threads_caso2];
     decode2[10] = '\0';
     
-    for(t=0; t<NUM_THREADS_CASO2; t++){   
+    for(t=0; t<n_threads_caso2; t++){   
         
-        taskids2[t] = (T *) malloc(sizeof(T)); 
-        taskids2[t]->thread_id = t;
+        task2[t] = (T *) malloc(sizeof(T)); 
+        task2[t]->thread_id = t;
         
-        rc = pthread_create(&threads2[t], NULL, &findChar2, (void *) taskids2[t]);      
+        rc = pthread_create(&threads2[t], NULL, &findChar2, (void *) task2[t]);      
         if (rc){         
             printf("ERRO; código de retorno é %d\n", rc);         
             exit(-1);      
         }   
     }
     
-    for(t=0; t<NUM_THREADS_CASO2; t++){
+    for(t=0; t<n_threads_caso2; t++){
         pthread_join(threads2[t], NULL);
     }
     
@@ -170,23 +170,23 @@ int main (int argc, char *argv[]){
     
     clock_t comeco3 = clock();
     
-    T *taskids3[NUM_THREADS_CASO3];
-    pthread_t threads3[NUM_THREADS_CASO3];
+    T *task3[n_threads_caso3];
+    pthread_t threads3[n_threads_caso3];
     decode3[10] = '\0';
     
-    for(t=0; t<NUM_THREADS_CASO3; t++){   
+    for(t=0; t<n_threads_caso3; t++){   
         
-        taskids3[t] = (T *) malloc(sizeof(T)); 
-        taskids3[t]->thread_id = t;
+        task3[t] = (T *) malloc(sizeof(T)); 
+        task3[t]->thread_id = t;
         
-        rc = pthread_create(&threads3[t], NULL, &findChar3, (void *) taskids3[t]);      
+        rc = pthread_create(&threads3[t], NULL, &findChar3, (void *) task3[t]);      
         if (rc){         
             printf("ERRO; código de retorno é %d\n", rc);         
             exit(-1);      
         }   
     }
     
-    for(t=0; t<NUM_THREADS_CASO3; t++){
+    for(t=0; t<n_threads_caso3; t++){
         pthread_join(threads3[t], NULL);
     }
     
