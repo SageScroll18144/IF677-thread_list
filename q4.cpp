@@ -138,23 +138,30 @@ int main(){
         A -= B;
     }
 
-    int Q1 = (N / lim_x), Q2 = (N / lim_y), idx = 0;
+    int Q1 = (lim_x / A) + 1, Q2 = (lim_y / B) + 1, idx = 0;
     
-    ii pairs_lim_x[Q1];
+    ii pairs_lim_x[A];
     for(int i = 0; i < lim_x; i += Q1){
-        pairs_lim_x[idx] = {i, (Q1 + idx * A) - 1};
+        pairs_lim_x[idx] = {i, i + Q1 - 1};
         idx++;
     }
-    pairs_lim_x[idx - 1] = {i, lim_x - 1};
-
+    pairs_lim_x[idx - 1].second = (lim_x - 1);
+    
     idx = 0;
-    ii pairs_lim_y[Q2];
+    ii pairs_lim_y[B];
     for(int i = 0; i < lim_y; i += Q2){
-        pairs_lim_y[idx] = {i, (Q2 + idx * B) - 1};
+        pairs_lim_y[idx] = {i, i + Q2 - 1};
         idx++;
     }
-    pairs_lim_y[idx - 1] = {i, lim_y - 1};    
+    pairs_lim_y[idx - 1].second = (lim_y - 1);    
 
+    for(int i=0;i<A;i++){
+        printf("{%d, %d}\n", pairs_lim_x[i].first, pairs_lim_x[i].second);
+    }
+    printf("\n");
+    for(int i=0;i<B;i++){
+        printf("{%d, %d}\n", pairs_lim_y[i].first, pairs_lim_y[i].second);
+    }
 
     //without thread
     solve(map_, 0, 0, lim_x, lim_y);
