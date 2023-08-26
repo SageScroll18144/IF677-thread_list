@@ -87,11 +87,11 @@ ii findFactors(int N) {
     while (a * a <= N) {
         if (N % a == 0) {
             int b = N / a;
-            if(a <= N && b <= N && 2*mid > (a + b))  {
+            if(a <= N && b <= N && mid > (a + b))  {
                 ans_a = a;
                 ans_b = b;
 
-                mid = (a + b) / 2;
+                mid = (a + b);
             }
         }
         a++;
