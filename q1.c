@@ -6,7 +6,7 @@
 #define n_threads_caso2 5
 #define n_threads_caso3 1  
 
-int count;
+
 char decode1[11];
 char decode2[11];
 char decode3[11];
@@ -29,7 +29,6 @@ void *findChar2(void *threadid){
             decode2[tid.char_t] = tid.comparador;
             flag = 1;
             printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
-            count++;
         }
         x++;
     }
@@ -45,7 +44,6 @@ void *findChar2(void *threadid){
             decode2[tid.char_t] = tid.comparador;
             flag = 1;
             printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
-            count++;
         }
         x++;
     }
@@ -65,7 +63,6 @@ void *findChar1(void *threadid){
             decode1[tid.char_t] = tid.comparador;
             flag = 1;
             printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
-            count++;
         }
         x++;
     }
@@ -86,7 +83,6 @@ void *findChar3(void *threadid){
                 decode3[tid.char_t] = tid.comparador;
                 flag = 1;
                 printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
-                count++;
             }
             x++;
         }
