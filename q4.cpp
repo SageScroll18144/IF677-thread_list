@@ -7,8 +7,16 @@ using namespace std;
 
 #define ii pair<int, int>
 
+typedef struct{
+    int lim_inf_x;
+    int lim_inf_y;
+    int lim_sup_x;
+    int lim_sup_y;
+}arguments_for_solve;
+
 const int maxn = 110; //max map_'s size
 ii ds[maxn][maxn];//set of fathers
+int map_[maxn][maxn];
 int adj_x[] = {0,0,-1,1,1,-1,1,-1};
 int adj_y[] = {1,-1,0,0,1,-1,-1,1};
 
@@ -38,7 +46,17 @@ void dsUnion(ii u, ii v){
     ds[v.first][v.second] = u;
 }
 
-void solve(int **map_, int lim_inf_x, int lim_inf_y, int lim_sup_x, int lim_sup_y){
+void *solve(void * args_){
+    arguments_for_solve *transform_args = (arguments_for_solve *) args_;
+    
+    int lim_inf_x = transform_args->lim_inf_x;
+    int lim_inf_y = transform_args->lim_inf_y;
+    int lim_sup_x = transform_args->lim_sup_x;
+    int lim_sup_y = transform_args->lim_sup_y;
+
+    pthread_t thread_id = pthread_self();
+    printf("Thread ID: %lu\n", thread_id);
+
     for (int x = lim_inf_x; x < lim_sup_x; x++){
         for (int y = lim_inf_y; y < lim_sup_y; y++){
             if(map_[x][y]){ //se for terra
@@ -49,6 +67,7 @@ void solve(int **map_, int lim_inf_x, int lim_inf_y, int lim_sup_x, int lim_sup_
                     if(ceil_adj_x >= 0 && ceil_adj_x < lim_sup_x && ceil_adj_y >= 0 && ceil_adj_y < lim_sup_y){
                         if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
                             dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
+                            printf("Entrei!\n");
                         }
                     }
                 }
@@ -56,10 +75,11 @@ void solve(int **map_, int lim_inf_x, int lim_inf_y, int lim_sup_x, int lim_sup_
         }
         
     }
-    
+    pthread_exit(NULL);
 }
 
-int counter_fathers(int **map_, int lim_inf_x, int lim_inf_y, int lim_sup_x, int lim_sup_y){
+int counter_fathers(int lim_inf_x, int lim_inf_y, int lim_sup_x, int lim_sup_y){
+    
     bool mark[lim_sup_x][lim_sup_y];
     memset(mark, false, sizeof(mark));
 
@@ -73,7 +93,9 @@ int counter_fathers(int **map_, int lim_inf_x, int lim_inf_y, int lim_sup_x, int
     for (int i = lim_inf_x; i < lim_sup_x; i++){
         for (int j = lim_inf_y; j < lim_sup_y; j++){
             if(mark[i][j]) counter_fathers++;
+            printf("%d",mark[i][j]);
         }
+        printf("\n");
     }
 
     return counter_fathers;
@@ -111,10 +133,8 @@ int main(){
 
     printf("- Informe a imagem do mapa:\n");
 
-    int **map_ = (int **) malloc(lim_x * sizeof(int *));
     char component;
     for (int i = 0; i < lim_x; i++){
-        map_[i] = (int *) malloc(lim_y * sizeof(int));
         for (int j = 0; j < lim_y; j++){
             scanf(" %c", &component);
             map_[i][j] = component - '0';
@@ -163,14 +183,41 @@ int main(){
         printf("{%d, %d}\n", pairs_lim_y[i].first, pairs_lim_y[i].second);
     }
 
-    //without thread
-    solve(map_, 0, 0, lim_x, lim_y);
-    printf("%d\n", counter_fathers(map_, 0, 0, lim_x, lim_y));
+    //aqui começa threads
+    pthread_t list_threads[N];
+    //int *taskids[N];
+    
+    arguments_for_solve **args_ = (arguments_for_solve **) malloc(sizeof(arguments_for_solve *) * N);
+            
+    int t = 0;
+    for (int i = 0; i < A; i++){
+        for (int j = 0; j < B; j++){
+            args_[t] = (arguments_for_solve *) malloc(sizeof(arguments_for_solve));
 
-    for(int i = 0; i < lim_x; i++) free(map_[i]);
-    free(map_);
+            args_[t]->lim_inf_x = pairs_lim_x[i].first;
+            args_[t]->lim_inf_y = pairs_lim_y[j].first;;
+            args_[t]->lim_sup_x = pairs_lim_x[i].second;
+            args_[t]->lim_sup_y = pairs_lim_y[j].second;
+            
+            printf("No main: criando thread %d\n", t);
 
-    return 0;
+            pthread_create(&list_threads[t], NULL, solve, (void *) args_[t]);
+            t++;
+
+        }
+        
+    }
+    
+    //printf("%d\n", t);
+    for(t = 0; t < N; t++) pthread_join(list_threads[t], NULL);
+
+    //Saida do programa
+    printf("O seu mapa têm %d ilhas!\n", counter_fathers(0, 0, lim_x, lim_y));
+
+    // for(int i = 0; i < N; i++) free(taskids[i]);
+    free(args_);
+
+    pthread_exit(NULL);
 }
 
 /*
