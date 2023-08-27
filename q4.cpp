@@ -54,20 +54,16 @@ void *solve(void * args_){
     int lim_sup_x = transform_args->lim_sup_x;
     int lim_sup_y = transform_args->lim_sup_y;
 
-    pthread_t thread_id = pthread_self();
-    printf("Thread ID: %lu\n", thread_id);
-
-    for (int x = lim_inf_x; x < lim_sup_x; x++){
-        for (int y = lim_inf_y; y < lim_sup_y; y++){
+    for (int x = lim_inf_x; x <= lim_sup_x; x++){
+        for (int y = lim_inf_y; y <= lim_sup_y; y++){
             if(map_[x][y]){ //se for terra
                 for(int adj = 0; adj < 8; adj++){
                     int ceil_adj_x = x + adj_x[adj];
                     int ceil_adj_y = y + adj_y[adj]; 
 
-                    if(ceil_adj_x >= 0 && ceil_adj_x < lim_sup_x && ceil_adj_y >= 0 && ceil_adj_y < lim_sup_y){
+                    if(ceil_adj_x >= lim_inf_x && ceil_adj_x <= lim_sup_x && ceil_adj_y >= lim_inf_y && ceil_adj_y <= lim_sup_y){
                         if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
                             dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
-                            printf("Entrei!\n");
                         }
                     }
                 }
@@ -93,9 +89,7 @@ int counter_fathers(int lim_inf_x, int lim_inf_y, int lim_sup_x, int lim_sup_y){
     for (int i = lim_inf_x; i < lim_sup_x; i++){
         for (int j = lim_inf_y; j < lim_sup_y; j++){
             if(mark[i][j]) counter_fathers++;
-            printf("%d",mark[i][j]);
         }
-        printf("\n");
     }
 
     return counter_fathers;
@@ -175,17 +169,8 @@ int main(){
     }
     pairs_lim_y[idx - 1].second = (lim_y - 1);    
 
-    for(int i=0;i<A;i++){
-        printf("{%d, %d}\n", pairs_lim_x[i].first, pairs_lim_x[i].second);
-    }
-    printf("\n");
-    for(int i=0;i<B;i++){
-        printf("{%d, %d}\n", pairs_lim_y[i].first, pairs_lim_y[i].second);
-    }
-
     //aqui começa threads
     pthread_t list_threads[N];
-    //int *taskids[N];
     
     arguments_for_solve **args_ = (arguments_for_solve **) malloc(sizeof(arguments_for_solve *) * N);
             
@@ -199,37 +184,48 @@ int main(){
             args_[t]->lim_sup_x = pairs_lim_x[i].second;
             args_[t]->lim_sup_y = pairs_lim_y[j].second;
             
-            printf("No main: criando thread %d\n", t);
-
             pthread_create(&list_threads[t], NULL, solve, (void *) args_[t]);
             t++;
 
         }
         
     }
-    
-    //printf("%d\n", t);
+
     for(t = 0; t < N; t++) pthread_join(list_threads[t], NULL);
+
+    for (t = 1; t < A; t++){
+        for (int x = 0; x < lim_y; x++){
+            if(map_[pairs_lim_x[t-1].second][x] && map_[pairs_lim_x[t].first][x]) dsUnion({pairs_lim_x[t-1].second, x}, {pairs_lim_x[t].first, x});
+        }
+    }
+
+    for (t = 1; t < B; t++){
+        for (int x = 0; x < lim_x; x++){
+            if(map_[x][pairs_lim_y[t-1].second] && map_[x][pairs_lim_y[t].first] ) dsUnion({x,map_[x][pairs_lim_y[t-1].second]}, {x,map_[x][pairs_lim_y[t].first]});
+        }
+    }
 
     //Saida do programa
     printf("O seu mapa têm %d ilhas!\n", counter_fathers(0, 0, lim_x, lim_y));
 
-    // for(int i = 0; i < N; i++) free(taskids[i]);
     free(args_);
 
     pthread_exit(NULL);
 }
 
 /*
-    Exemplo de entrada:
+    Exemplo:
 
-        - Informe o número de linhas e colunas: 5 7
-        - Informe a imagem do mapa:
-        1111000
-        1110000
-        0000100
-        0000011
-        0000111
-        Informe o número N de Threads: 5
+    *entrada*
+    - Informe o número de linhas e colunas: 5 7
+    - Informe a imagem do mapa:
+    1111000
+    1110000
+    0000000
+    0010011
+    0000111
+    Informe o número N de Threads: 4
+    *saida*
+    O seu mapa têm 3 ilhas!
 
 */
