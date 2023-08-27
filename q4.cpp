@@ -61,7 +61,8 @@ void *solve(void * args_){
                     int ceil_adj_x = x + adj_x[adj];
                     int ceil_adj_y = y + adj_y[adj]; 
 
-                    if(ceil_adj_x >= lim_inf_x && ceil_adj_x <= lim_sup_x && ceil_adj_y >= lim_inf_y && ceil_adj_y <= lim_sup_y){
+                    //além de realizar a união com os elementos pertencente ao campo, realiza támbem com a fronteira
+                    if(ceil_adj_x >= 0 && ceil_adj_x <= lim_sup_x && ceil_adj_y >= 0 && ceil_adj_y <= lim_sup_y){
                         if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
                             dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
                         }
@@ -99,11 +100,11 @@ ii findFactors(int N) {
     int ans_a = -1;
     int ans_b = -1;
     
-    int a = 1, mid = N+1;
+    int a = 1, mid = N+100000;
     while (a * a <= N) {
         if (N % a == 0) {
             int b = N / a;
-            if(a <= N && b <= N && mid > (a + b))  {
+            if(mid > (a + b))  {
                 ans_a = a;
                 ans_b = b;
 
@@ -167,11 +168,10 @@ int main(){
         pairs_lim_y[idx] = {i, i + Q2 - 1};
         idx++;
     }
-    pairs_lim_y[idx - 1].second = (lim_y - 1);    
+    pairs_lim_y[idx - 1].second = (lim_y - 1);   
 
     //aqui começa threads
     pthread_t list_threads[N];
-    
     arguments_for_solve **args_ = (arguments_for_solve **) malloc(sizeof(arguments_for_solve *) * N);
             
     int t = 0;
@@ -193,18 +193,6 @@ int main(){
 
     for(t = 0; t < N; t++) pthread_join(list_threads[t], NULL);
 
-    for (t = 1; t < A; t++){
-        for (int x = 0; x < lim_y; x++){
-            if(map_[pairs_lim_x[t-1].second][x] && map_[pairs_lim_x[t].first][x]) dsUnion({pairs_lim_x[t-1].second, x}, {pairs_lim_x[t].first, x});
-        }
-    }
-
-    for (t = 1; t < B; t++){
-        for (int x = 0; x < lim_x; x++){
-            if(map_[x][pairs_lim_y[t-1].second] && map_[x][pairs_lim_y[t].first] ) dsUnion({x,map_[x][pairs_lim_y[t-1].second]}, {x,map_[x][pairs_lim_y[t].first]});
-        }
-    }
-
     //Saida do programa
     printf("O seu mapa têm %d ilhas!\n", counter_fathers(0, 0, lim_x, lim_y));
 
@@ -225,6 +213,18 @@ int main(){
     0010011
     0000111
     Informe o número N de Threads: 4
+    *saida*
+    O seu mapa têm 3 ilhas!
+
+    *entrada
+    - Informe o número de linhas e colunas: 5 7
+    - Informe a imagem do mapa:
+    1111000
+    1110000
+    0000000
+    0010011
+    0000111
+    Informe o número N de Threads: 8
     *saida*
     O seu mapa têm 3 ilhas!
 
