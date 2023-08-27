@@ -1,7 +1,9 @@
-#include <bits/stdc++.h>
-#include <pthread.h>
+#include <iostream>
+#include <utility>
+#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 using namespace std;
 
