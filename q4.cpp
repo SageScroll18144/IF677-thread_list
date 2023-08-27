@@ -174,7 +174,7 @@ int main(){
     pthread_t list_threads[N];
     arguments_for_solve **args_ = (arguments_for_solve **) malloc(sizeof(arguments_for_solve *) * N);
             
-    int t = 0;
+    int t = 0, rc;
     for (int i = 0; i < A; i++){
         for (int j = 0; j < B; j++){
             args_[t] = (arguments_for_solve *) malloc(sizeof(arguments_for_solve));
@@ -184,7 +184,11 @@ int main(){
             args_[t]->lim_sup_x = pairs_lim_x[i].second;
             args_[t]->lim_sup_y = pairs_lim_y[j].second;
             
-            pthread_create(&list_threads[t], NULL, solve, (void *) args_[t]);
+            rc = pthread_create(&list_threads[t], NULL, solve, (void *) args_[t]);
+            if(rc){         
+                printf("ERRO; código de retorno é %d\n", rc);         
+                exit(-1);      
+            } 
             t++;
 
         }
