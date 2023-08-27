@@ -10,7 +10,7 @@
 char decode1[11];
 char decode2[11];
 char decode3[11];
-char senha[] = "aei!_45IOU";
+char senha[] = "a!i!_45IOU";
 
 typedef struct thread_code{
     int thread_id;
@@ -23,7 +23,7 @@ void *findChar2(void *threadid){
     T tid = *((T *)threadid);
     int flag = 0, x = 33;
     tid.char_t = tid.thread_id;
-    for(; tid.comparador || flag == 0;){
+    for(; flag == 0;){
         tid.comparador = x;
         if(tid.comparador == senha[tid.char_t]){
             decode2[tid.char_t] = tid.comparador;
@@ -38,7 +38,7 @@ void *findChar2(void *threadid){
     flag = 0;
     tid.char_t = tid.char_t + 5;
     
-    for(; tid.comparador || flag == 0;){
+    for(;flag == 0;){
         tid.comparador = x;
         if(tid.comparador == senha[tid.char_t]){
             decode2[tid.char_t] = tid.comparador;
@@ -57,7 +57,7 @@ void *findChar1(void *threadid){
     T tid = *((T *)threadid);
     int flag = 0, x = 33;
     tid.char_t = tid.thread_id;
-    for(; tid.comparador || flag == 0;){
+    for(;flag == 0;){
         tid.comparador = x;
         if(tid.comparador == senha[tid.char_t]){
             decode1[tid.char_t] = tid.comparador;
