@@ -8,8 +8,6 @@ class for_parameters {
         int start, end, step;
         void (*function)(int);
 };
-
-bool still_allocating_work;
 const int OMP_NUM_THREADS = 4; // variavel global relativo ao numero de threads
 pthread_mutex_t request = PTHREAD_MUTEX_INITIALIZER; // mutex para o schedule dynamic/guided 
 pthread_mutex_t write_on_screen = PTHREAD_MUTEX_INITIALIZER; // mutex para escrita
@@ -29,7 +27,7 @@ int max(int a, int b) {
 void* for_thread_static(void * var) {
     int thread_num = *((int *)var), i;
     for_parameters parameter;
-    while(still_allocating_work || !work[thread_num].empty()) {
+    while(!work[thread_num].empty()) {
         parameter = work[thread_num].top();
         work[thread_num].pop();
         for(i = parameter.start; i<=parameter.end; i += parameter.step) {
@@ -77,7 +75,6 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
 
         }
     }
-    still_allocating_work = false;
     for(int i = 0; i<OMP_NUM_THREADS; i++) { // espera ate todas as iteracoes acabarem
         pthread_join(thread[i], NULL);
     }
