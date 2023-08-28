@@ -30,9 +30,9 @@ void *WriteData(void *threadid) {
         }
         //entrando na região crítica
         writing = true;
-        cout << "Digite o valor para ser adicionado no array pela thread " << tid.thread_id << " na posicao " << tid.pos << endl;
-        cin >> value;
+        value = rand()%tid.TAM;
         array[tid.pos] = value;
+        cout << "Valor "<< value << " adicionado na posicao " << tid.pos << endl;
         
         writing = false;
         pthread_cond_signal(&write); //acorda uma única thread de escrita
@@ -48,6 +48,7 @@ void *ReadData(void *threadid) {
     while(1) {
         tid.pos = rand() % tid.TAM;
         
+        pthread_mutex_lock(&mutex);
         while(writing) { //Caso haja operação de escrita, aguarde
             pthread_cond_wait(&read, &mutex);
         }
