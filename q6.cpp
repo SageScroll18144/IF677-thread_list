@@ -18,7 +18,12 @@ stack<for_parameters> work[OMP_NUM_THREADS]; // vetor de stacks contendo as iter
 
 void funcao(int i) {
     // funcao exemplo
-    cout << "Iteracao " << i+1 << endl;
+    cout << "Iteracao " << i+1;
+}
+
+int max(int a, int b) {
+    if(a>b) return a;
+    else return b;
 }
 
 void* for_thread(void * var) {
@@ -33,6 +38,7 @@ void* for_thread(void * var) {
             for(i = parameter.start; i<=parameter.end; i += parameter.step) {
                 pthread_mutex_lock(&write_on_screen);
                 parameter.function(i);
+                cout << " na thread " << thread_num << endl;
                 pthread_mutex_unlock(&write_on_screen);
             }
         }
@@ -58,11 +64,13 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
     //inserindo as iteracoes a serem feitas por cada thread de acordo com o schedule
     switch(schedule) {
         case 0: {
+            int tasknum = chunk_size;
             while(iteration < final) {
-                if(iteration+(chunk_size*passo)-1 >= final) temp = final-1;
-                else temp = iteration+(chunk_size*passo)-1;
+                if(thread_num == 0 && final-iteration<OMP_NUM_THREADS*tasknum) tasknum = max((final-iteration)/OMP_NUM_THREADS,1);
+                if(iteration+(tasknum*passo)-1 >= final) temp = final-1;
+                else temp = iteration+(tasknum*passo)-1;
                 for_parameters parameters = {iteration, temp, passo, f};
-                iteration += chunk_size*passo;
+                iteration += tasknum*passo;
                 pthread_mutex_lock(&acess_to_task[thread_num]);
                 work[thread_num].push(parameters);
                 pthread_mutex_unlock(&acess_to_task[thread_num]);
@@ -92,7 +100,7 @@ int main() {
     {   
     f(i);
     }*/
-    int inicio = 0, passo = 1, final = 8, chunk_size = 2, schedule = 0; // schedule 0 = static, schedule 1 = dynamic, schedule 2 = guided
+    int inicio = 0, passo = 1, final = 100, chunk_size = 10, schedule = 0; // schedule 0 = static, schedule 1 = dynamic, schedule 2 = guided
     omp_for(inicio, passo, final, schedule, chunk_size, funcao);
     return 0;
 }
