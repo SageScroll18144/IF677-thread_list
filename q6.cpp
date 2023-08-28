@@ -59,7 +59,7 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
     switch(schedule) {
         case 0: {
             while(iteration < final) {
-                if(iteration+(chunk_size*passo)-1 > final) temp = final-1;
+                if(iteration+(chunk_size*passo)-1 >= final) temp = final-1;
                 else temp = iteration+(chunk_size*passo)-1;
                 for_parameters parameters = {iteration, temp, passo, f};
                 iteration += chunk_size*passo;
