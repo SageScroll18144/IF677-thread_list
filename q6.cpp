@@ -26,21 +26,17 @@ int max(int a, int b) {
     else return b;
 }
 
-void* for_thread(void * var) {
+void* for_thread_static(void * var) {
     int thread_num = *((int *)var), i;
     for_parameters parameter;
     while(still_allocating_work || !work[thread_num].empty()) {
-        if(!work[thread_num].empty()) {
-            pthread_mutex_lock(&acess_to_task[thread_num]);
-            parameter = work[thread_num].top();
-            work[thread_num].pop();
-            pthread_mutex_unlock(&acess_to_task[thread_num]);
-            for(i = parameter.start; i<=parameter.end; i += parameter.step) {
-                pthread_mutex_lock(&write_on_screen);
-                parameter.function(i);
-                cout << " na thread " << thread_num << endl;
-                pthread_mutex_unlock(&write_on_screen);
-            }
+        parameter = work[thread_num].top();
+        work[thread_num].pop();
+        for(i = parameter.start; i<=parameter.end; i += parameter.step) {
+            pthread_mutex_lock(&write_on_screen);
+            parameter.function(i);
+            cout << " na thread " << thread_num << endl;
+            pthread_mutex_unlock(&write_on_screen);
         }
     }
     free(var);
@@ -51,16 +47,6 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
     int iteration = 0, thread_num = 0, error, temp;
     still_allocating_work = true;
     pthread_t thread[OMP_NUM_THREADS];
-    // criando as threads que ficarao em espera
-    for(int i = 0; i<OMP_NUM_THREADS; i++) {
-        int* num = (int *) malloc(sizeof(int));
-        *num = i;
-        error = pthread_create(&thread[i], NULL, for_thread, (void*)num);
-        if(error != 0) {
-            cout << "Erro na criacao de thread";
-            exit(1);
-        }
-    }
     //inserindo as iteracoes a serem feitas por cada thread de acordo com o schedule
     switch(schedule) {
         case 0: {
@@ -71,10 +57,17 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                 else temp = iteration+(tasknum*passo)-1;
                 for_parameters parameters = {iteration, temp, passo, f};
                 iteration += tasknum*passo;
-                pthread_mutex_lock(&acess_to_task[thread_num]);
                 work[thread_num].push(parameters);
-                pthread_mutex_unlock(&acess_to_task[thread_num]);
                 thread_num = (thread_num+1)%OMP_NUM_THREADS;
+            }
+            for(int i = 0; i<OMP_NUM_THREADS; i++) {
+                int* num = (int *) malloc(sizeof(int));
+                *num = i;
+                error = pthread_create(&thread[i], NULL, for_thread_static, (void*)num);
+                if(error != 0) {
+                    cout << "Erro na criacao de thread";
+                    exit(1);
+                }
             }
         }
         case 1: {
