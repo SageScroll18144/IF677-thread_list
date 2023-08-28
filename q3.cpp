@@ -23,8 +23,8 @@ void *WriteData(void *threadid) {
     Thread tid = *((Thread *) threadid);
     int pos, value;
     while(1) {
-        tid.pos = rand() % tid.TAM;
         pthread_mutex_lock(&mutex);
+        tid.pos = rand() % tid.TAM;
         while(readers > 0 || writing) { //Caso haja operações de leitura ou de escrita, aguarde
             pthread_cond_wait(&write, &mutex);
         }
@@ -52,9 +52,11 @@ void *ReadData(void *threadid) {
             pthread_cond_wait(&read, &mutex);
         }
         pthread_mutex_unlock(&mutex);
+    
         readers++;
         
         printf("Valor da leitura na posicao %d do array eh %d (Lido pela thread %d)\n", tid.pos, array[tid.pos], tid.thread_id);
+        
         
         if(readers == tid.size) {
             readers = 0;
