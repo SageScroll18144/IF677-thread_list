@@ -128,7 +128,7 @@ int main() {
         }
     }
   
-    for(int r = 0, w = 0; r < N, w < M ; r++, w++) {
+    for(int r = 0, w = 0; r < N && w < M ; r++, w++) {
         pthread_join(threads_read[r], NULL);
         pthread_join(threads_write[w], NULL);
     }
