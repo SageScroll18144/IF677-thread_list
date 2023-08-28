@@ -47,8 +47,7 @@ void *ReadData(void *threadid) {
     Thread tid = *((Thread *) threadid);
     while(1) {
         tid.pos = rand() % tid.TAM;
-        
-        pthread_mutex_lock(&mutex);
+
         while(writing) { //Caso haja operação de escrita, aguarde
             pthread_cond_wait(&read, &mutex);
         }
