@@ -16,6 +16,7 @@ typedef struct {
     int thread_id;
     int TAM;
     int pos;
+    int size;
 }Thread;
 
 void *WriteData(void *threadid) {
@@ -24,18 +25,18 @@ void *WriteData(void *threadid) {
     while(1) {
         tid.pos = rand() % tid.TAM;
         pthread_mutex_lock(&mutex);
-        while(readers > 0 || writing) {  //Caso haja operações de leitura ou de escrita, aguarde
+        while(readers > 0 || writing) { //Caso haja operações de leitura ou de escrita, aguarde
             pthread_cond_wait(&write, &mutex);
         }
         //entrando na região crítica
         writing = true;
-        cout << "Digite o valor para ser adicionado no array pela thread " << tid.thread_id << " na posição " << tid.pos << endl;
+        cout << "Digite o valor para ser adicionado no array pela thread " << tid.thread_id << " na posicao " << tid.pos << endl;
         cin >> value;
         array[tid.pos] = value;
         
         writing = false;
-        pthread_cond_broadcast(&read); //acorda todas as threads de leitura que estão dependendo da variável read para prosseguir
         pthread_cond_signal(&write); //acorda uma única thread de escrita
+        pthread_cond_broadcast(&read); //acorda todas as threads de leitura que estão dependendo da variável read para prosseguir
         pthread_mutex_unlock(&mutex);
     }
     
@@ -47,22 +48,18 @@ void *ReadData(void *threadid) {
     while(1) {
         tid.pos = rand() % tid.TAM;
         
-        pthread_mutex_lock(&mutex);
         while(writing) { //Caso haja operação de escrita, aguarde
             pthread_cond_wait(&read, &mutex);
         }
-        
         pthread_mutex_unlock(&mutex);
-        
         readers++;
-
+        
         printf("Valor da leitura na posicao %d do array eh %d (Lido pela thread %d)\n", tid.pos, array[tid.pos], tid.thread_id);
         
-        pthread_mutex_lock(&mutex);
-        readers--;
-        if(readers == 0) pthread_cond_signal(&write); //Libera a escrita caso não haja leituras
-        
-        pthread_mutex_unlock(&mutex);
+        if(readers == tid.size) {
+            readers = 0;
+            pthread_cond_signal(&write); //Libera a escrita caso não haja leituras
+        }
     }
     
     pthread_exit(NULL);
@@ -105,6 +102,7 @@ int main() {
         write[t] = (Thread *) malloc(sizeof(Thread));
         write[t]->thread_id = t;
         write[t]->TAM = tam; 
+        write[t]->size = M;
         
         rc = pthread_create(&threads_write[t], NULL, &WriteData, (void *) write[t]);
         
@@ -117,7 +115,8 @@ int main() {
     for(int t = 0; t < N; t++) {
         read[t] = (Thread *) malloc(sizeof(Thread));
         read[t]->thread_id = t;
-        read[t]->TAM = tam;    
+        read[t]->TAM = tam;   
+        read[t]->size = N;
         
         rc = pthread_create(&threads_read[t], NULL, &ReadData, (void *) read[t]);
         
