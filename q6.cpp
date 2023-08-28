@@ -30,7 +30,7 @@ void* for_thread(void * var) {
             parameter = work[thread_num].top();
             work[thread_num].pop();
             pthread_mutex_unlock(&acess_to_task[thread_num]);
-            for(i = parameter.start; i<parameter.end; i += parameter.step) {
+            for(i = parameter.start; i<=parameter.end; i += parameter.step) {
                 pthread_mutex_lock(&write_on_screen);
                 parameter.function(i);
                 pthread_mutex_unlock(&write_on_screen);
@@ -59,7 +59,7 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
     switch(schedule) {
         case 0: {
             while(iteration < final) {
-                if(iteration+(chunk_size*passo)-1 > final) temp = final;
+                if(iteration+(chunk_size*passo)-1 > final) temp = final-1;
                 else temp = iteration+(chunk_size*passo)-1;
                 for_parameters parameters = {iteration, temp, passo, f};
                 iteration += chunk_size*passo;
