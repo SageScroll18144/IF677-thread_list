@@ -5,6 +5,7 @@
 using namespace std;
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t read = PTHREAD_COND_INITIALIZER;
 pthread_cond_t write = PTHREAD_COND_INITIALIZER;
 
@@ -32,7 +33,7 @@ void *WriteData(void *threadid) {
         writing = true;
         value = rand()%tid.TAM;
         array[tid.pos] = value;
-        cout << "Valor "<< value << " adicionado na posicao " << tid.pos << endl;
+        printf("Valor %d adicionado na posicao %d\n", value, tid.pos);
         
         writing = false;
         pthread_cond_signal(&write); //acorda uma única thread de escrita
@@ -47,15 +48,16 @@ void *ReadData(void *threadid) {
     Thread tid = *((Thread *) threadid);
     while(1) {
         tid.pos = rand() % tid.TAM;
-
+        
+        pthread_mutex_lock(&mutex1);
         while(writing) { //Caso haja operação de escrita, aguarde
-            pthread_cond_wait(&read, &mutex);
+            pthread_cond_wait(&read, &mutex1);
         }
-        pthread_mutex_unlock(&mutex);
+        pthread_mutex_unlock(&mutex1);
     
         readers++;
         
-        printf("Valor da leitura na posicao %d do array eh %d (Lido pela thread %d)\n", tid.pos, array[tid.pos], tid.thread_id);
+        if(!writing) printf("Valor da leitura na posicao %d do array eh %d (Lido pela thread %d)\n", tid.pos, array[tid.pos], tid.thread_id); //Apenas ler caso não tenha escrita
         
         
         if(readers == tid.size) {
