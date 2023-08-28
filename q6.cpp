@@ -24,7 +24,7 @@ void funcao(int i) {
 void* for_thread(void * var) {
     int thread_num = *((int *)var), i;
     for_parameters parameter;
-    while(still_allocating_work) {
+    while(still_allocating_work || !work[thread_num].empty()) {
         if(!work[thread_num].empty()) {
             pthread_mutex_lock(&acess_to_task[thread_num]);
             parameter = work[thread_num].top();
