@@ -26,7 +26,7 @@ void *WriteData(void *threadid) {
     while(1) {
         pthread_mutex_lock(&mutex);
         tid.pos = rand() % tid.TAM;
-        while(readers > 0 || writing) { //Caso haja operações de leitura ou de escrita, aguarde
+        while(writing) { //Caso haja operações de escrita, aguarde
             pthread_cond_wait(&write, &mutex);
         }
         //entrando na região crítica
