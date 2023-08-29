@@ -72,27 +72,15 @@ void *ReadData(void *threadid) {
 
 int main() {
     int N, M, rc, tam;
-    int flag = 1;
+      
+    cout << "Qual o valor N de threads leitoras?" << endl;
+    cin >> N;
     
-    while(flag) { //loop para checar a validade da entrada
-        
-        cout << "Qual o valor N de threads leitoras?" << endl;
-        cin >> N;
-        
-        cout << "Qual o valor M de threads escritoras?" << endl;
-        cin >> M;
-        
-        int bigger = max(M, N);
-        
-        cout << "Qual eh o tamanho do array?" << endl;
-        cin >> tam;
-        
-        if(bigger <= tam) flag = 0; //Isso é feito para que o tamanho do array seja maior que N e M
-        
-        else {
-            cout << "Entrada invalida" << endl << "Digite novamente os valores de N, M e o tamanho do array" << endl << endl;
-        }
-    }
+    cout << "Qual o valor M de threads escritoras?" << endl;
+    cin >> M;
+    
+    cout << "Qual eh o tamanho do array?" << endl;
+    cin >> tam;
     
     array = (int *) malloc(sizeof(int) * tam); 
     

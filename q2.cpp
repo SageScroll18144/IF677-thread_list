@@ -8,12 +8,12 @@ using namespace std;
 
 const int maxn = 110;
 
-vector<int> graph[maxn];
-bool visited[maxn];
+vector<int> graph[maxn]; //grafo por lista de adjacência 
+bool visited[maxn]; //vetor de visitados
 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; //mutex, pois todas as threads acessam o grafo
 
-bool flag_ans = false;
+bool flag_ans = false; //flag de resposta para saber se achamos o ciclo
 
 bool DFS_find_cycle(int node){
     visited[node] = true;
@@ -23,6 +23,7 @@ bool DFS_find_cycle(int node){
     }
     return false;
 }
+
 
 void *solve(void * args_){
     int *node = (int *) args_;

@@ -15,6 +15,7 @@ typedef struct thread_id{
 void *primos(void *threadid){
     while(curr < N){
         pthread_mutex_lock(&mutex);
+        
         T tid = *((T*) threadid);
         tid.numero = curr;
         while(array[tid.numero] == false && tid.numero < N){
@@ -74,9 +75,5 @@ int main()
         }
     }
     
-    
-    
-   
-
-   pthread_exit(NULL);
+    pthread_exit(NULL);
 }

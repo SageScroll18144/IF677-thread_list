@@ -9,6 +9,7 @@ class for_parameters {
         int start, end, step;
         void (*function)(int);
 };
+
 const int OMP_NUM_THREADS = 4; // variavel global relativo ao numero de threads
 pthread_mutex_t request = PTHREAD_MUTEX_INITIALIZER; // mutex para o schedule dynamic/guided 
 pthread_mutex_t write_on_screen = PTHREAD_MUTEX_INITIALIZER; // mutex para escrita
@@ -56,9 +57,13 @@ void* for_thread_dynamic(void * var) {
         }
     }
     free(var);
+
+    // Teste para saber quando a thread foi encerrada
+
     //pthread_mutex_lock(&write_on_screen);
     //cout << "A thread " << thread_num << " foi encerrada" << endl;
     //pthread_mutex_unlock(&write_on_screen);
+
     pthread_exit(NULL);
 }
 
@@ -107,9 +112,14 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                     if(iteration+(chunk_size*passo)-1 >= final) temp = final-1;
                     else temp = iteration+(chunk_size*passo)-1;
                     for_parameters parameters = {iteration, temp, passo, f};
+
+                    // Teste para conferir a alocação das iterações
+
                     //pthread_mutex_lock(&write_on_screen);
                     //cout << "Alocando " << chunk_size << " na thread " << thread_num << endl;
                     //pthread_mutex_unlock(&write_on_screen);
+                    
+                    
                     iteration += chunk_size*passo;
                     work[thread_num].push(parameters);
                     task[thread_num] = true;
@@ -138,9 +148,13 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                     if(iteration+(tasknum*passo)-1 >= final) temp = final-1;
                     else temp = iteration+(tasknum*passo)-1;
                     for_parameters parameters = {iteration, temp, passo, f};
+
+                    // Teste para conferir a alocação das iterações
+
                     //pthread_mutex_lock(&write_on_screen);
                     //cout << "Alocando " << chunk_size << " na thread " << thread_num << endl;
                     //pthread_mutex_unlock(&write_on_screen);
+
                     iteration += tasknum*passo;
                     work[thread_num].push(parameters);
                     task[thread_num] = true;
@@ -160,12 +174,16 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
 int main() {
     cin.tie(0);
     ios_base::sync_with_stdio(false);
+
     // queremos simular o seguinte macro
-    /*#pragma omp for
-    for(int i = inicio ; i < final ; i += passo )
-    {   
-    f(i);
-    }*/
+    /*
+    #pragma omp for
+        for(int i = inicio ; i < final ; i += passo )
+        {   
+            f(i);
+        }
+    */
+    
     int inicio, passo, final, chunk_size, schedule; // schedule 0 = static, schedule 1 = dynamic, schedule 2 = guided
     int option;
     

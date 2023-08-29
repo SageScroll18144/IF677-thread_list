@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 #define n_threads_caso1 10 
 #define n_threads_caso2 5
 #define n_threads_caso3 1  
-
 
 char decode1[11];
 char decode2[11];
@@ -18,51 +18,18 @@ typedef struct thread_code{
     int char_t;
 }T;
 
-void *findChar2(void *threadid){   
-    
-    T tid = *((T *)threadid);
-    int flag = 0, x = 33;
-    tid.char_t = tid.thread_id;
-    for(; flag == 0;){
-        tid.comparador = x;
-        if(tid.comparador == senha[tid.char_t]){
-            decode2[tid.char_t] = tid.comparador;
-            flag = 1;
-            printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
-        }
-        x++;
-    }
-    
-    
-    x = 33;
-    flag = 0;
-    tid.char_t = tid.char_t + 5;
-    
-    for(;flag == 0;){
-        tid.comparador = x;
-        if(tid.comparador == senha[tid.char_t]){
-            decode2[tid.char_t] = tid.comparador;
-            flag = 1;
-            printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
-        }
-        x++;
-    }
-    
-    flag = 0;
-    pthread_exit(NULL);
-}
-
+//solução caso 1
 void *findChar1(void *threadid){   
-    
     T tid = *((T *)threadid);
-    int flag = 0, x = 33;
+    int flag = 0; //flag para saber se achou o caractere
+    int x = 33; //primeiro caractere possivel para uma senha dado na tabela ASCII
     tid.char_t = tid.thread_id;
-    for(;flag == 0;){
+    while(!flag){
         tid.comparador = x;
         if(tid.comparador == senha[tid.char_t]){
             decode1[tid.char_t] = tid.comparador;
             flag = 1;
-            printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
+            printf("caracter %d achado pela thread %d\n", tid.char_t, (tid.thread_id + 1));
         }
         x++;
     }
@@ -71,18 +38,53 @@ void *findChar1(void *threadid){
     pthread_exit(NULL);
 }
 
+//solução caso 2
+void *findChar2(void *threadid){    
+    T tid = *((T *)threadid);
+    int flag = 0; //flag para saber se achou o caractere
+    int x = 33; //primeiro caractere possivel para uma senha dado na tabela ASCII
+    tid.char_t = tid.thread_id;
+    while(!flag){
+        tid.comparador = x;
+        if(tid.comparador == senha[tid.char_t]){
+            decode2[tid.char_t] = tid.comparador;
+            flag = 1;
+            printf("caracter %d achado pela thread %d\n", tid.char_t, (tid.thread_id + 1));
+        }
+        x++;
+    }
+    
+    x = 33;
+    flag = 0;
+    tid.char_t += 5;
+    
+    while(!flag){
+        tid.comparador = x;
+        if(tid.comparador == senha[tid.char_t]){
+            decode2[tid.char_t] = tid.comparador;
+            flag = 1;
+            printf("caracter %d achado pela thread %d\n", tid.char_t, (tid.thread_id + 1));
+        }
+        x++;
+    }
+    
+    flag = 0;
+    pthread_exit(NULL);
+}
 
+//solução para o terceiro caso 
 void *findChar3(void *threadid){   
     for(int i=0; i<10; i++){
         T tid = *((T *)threadid);
-        int flag = 0, x = 33;
+        int flag = 0; //flag para saber se achou o caractere
+        int x = 33; //primeiro caractere possivel para uma senha dado na tabela ASCII
         tid.char_t = i;
-        for(; tid.comparador || flag == 0;){
+        while(!flag){
             tid.comparador = x;
             if(tid.comparador == senha[tid.char_t]){
                 decode3[tid.char_t] = tid.comparador;
                 flag = 1;
-                printf("caracter %d achado pela thread %d\n\n", tid.char_t, (tid.thread_id + 1));
+                printf("caracter %d achado pela thread %d\n", tid.char_t, (tid.thread_id + 1));
             }
             x++;
         }
@@ -125,19 +127,18 @@ int main (){
     
     time1 = (double) (fim1 - comeco1)/CLOCKS_PER_SEC;
     
-    printf("%0.7f\n\n", time1);
+    printf("\nTempo do Caso 1: %0.7f\n", time1);
   
-   printf("%s\n\n", decode1);
+    printf("Senha decodificada: %s\n\n", decode1);
    
+    printf("Caso 2 (5 threads):\n\n");
    
-   printf("Caso 2 (5 threads):\n\n");
-   
-   clock_t comeco2 = clock();
-    
+    clock_t comeco2 = clock();
+
     T *task2[n_threads_caso2];
     pthread_t threads2[n_threads_caso2];
     decode2[10] = '\0';
-    
+
     for(t=0; t<n_threads_caso2; t++){   
         
         task2[t] = (T *) malloc(sizeof(T)); 
@@ -149,27 +150,27 @@ int main (){
             exit(-1);      
         }   
     }
-    
+
     for(t=0; t<n_threads_caso2; t++){
         pthread_join(threads2[t], NULL);
     }
-    
+
     clock_t fim2 = clock();
-    
+
     time2 = (double) (fim2 - comeco2)/CLOCKS_PER_SEC;
-    
-    printf("%0.7f\n\n", time2);
-    
-    printf("%s\n\n", decode3);
-    
-    printf("Caso 3 (1 threads):\n\n");
-    
+
+    printf("\nTempo do Caso 2: %0.7f\n", time2);
+
+    printf("Senha decodificada: %s\n\n", decode3);
+
+    printf("Caso 3 (1 threads):\n");
+
     clock_t comeco3 = clock();
-    
+
     T *task3[n_threads_caso3];
     pthread_t threads3[n_threads_caso3];
     decode3[10] = '\0';
-    
+
     for(t=0; t<n_threads_caso3; t++){   
         
         task3[t] = (T *) malloc(sizeof(T)); 
@@ -181,20 +182,21 @@ int main (){
             exit(-1);      
         }   
     }
-    
+
     for(t=0; t<n_threads_caso3; t++){
         pthread_join(threads3[t], NULL);
     }
-    
+
     clock_t fim3 = clock();
-    
+
     time3 = (double) (fim3 - comeco3)/CLOCKS_PER_SEC;
-    
-    printf("%s\n\n", decode3);
-    
-    printf("tempo de execucao 10 threads : %0.7f\n\n", time1);
-    printf("tempo de execucao 5 threads : %0.7f\n\n", time2);
-    printf("tempo de execucao 1 thread : %0.7f\n\n", time3);
-  
+
+    printf("\nTempo do Caso 3: %0.7f\n", time3);
+    printf("Senha decodificada: %s\n\n", decode3);
+
+    printf("tempo de execucao 10 threads : %0.7f\n", time1);
+    printf("tempo de execucao 5 threads : %0.7f\n", time2);
+    printf("tempo de execucao 1 thread : %0.7f\n", time3);
+
     pthread_exit(NULL);
 }
