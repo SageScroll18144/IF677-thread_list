@@ -42,7 +42,7 @@ void* for_thread_static(void * var) {
 void* for_thread_dynamic(void * var) {
     int thread_num = *((int *)var), i;
     for_parameters parameter;
-    while(not_finished) {
+    while(not_finished || task[thread_num]) {
         if(task[thread_num]) {
             parameter = work[thread_num].top();
             work[thread_num].pop();
