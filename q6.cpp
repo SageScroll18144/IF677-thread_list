@@ -10,9 +10,11 @@ class for_parameters {
         void (*function)(int);
 };
 const int OMP_NUM_THREADS = 4; // variavel global relativo ao numero de threads
+pthread_mutex_t request = PTHREAD_MUTEX_INITIALIZER; // mutex para o schedule dynamic/guided 
 pthread_mutex_t write_on_screen = PTHREAD_MUTEX_INITIALIZER; // mutex para escrita
-bool task[OMP_NUM_THREADS]; // semaforo para as threads
-bool not_finished, wait; // variaveis auxiliares
+pthread_mutex_t access_to_task[OMP_NUM_THREADS]; // mutex para acesso ao vetor work
+bool task[OMP_NUM_THREADS];
+bool not_finished;
 stack<for_parameters> work[OMP_NUM_THREADS]; // vetor de stacks contendo as iteracoes a serem realizadas por cada thread
 
 void funcao(int i) {
@@ -85,7 +87,7 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
         } break;
         case 1: {
             int iteration = inicio, thread_num = 0, i;
-            not_finished = true; wait = false;
+            not_finished = true;
             bool check;
             for(int i = 0; i<OMP_NUM_THREADS; i++) {
                 int* num = (int *) malloc(sizeof(int));
@@ -98,30 +100,21 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                 task[i] = false;
             }
             while(not_finished) {
-                if(wait) {
-                    check = true;
-                    for(i = 0; i<OMP_NUM_THREADS; i++) {
-                        check = check && !task[i];
-                    }
-                    if(check) {
-                        not_finished = false;
-                    }
-                }
-                else if(!task[thread_num]) {
+                if(!task[thread_num]) {
                     if(iteration+(chunk_size*passo)-1 >= final) temp = final-1;
                     else temp = iteration+(chunk_size*passo)-1;
                     for_parameters parameters = {iteration, temp, passo, f};
                     iteration += chunk_size*passo;
                     work[thread_num].push(parameters);
                     task[thread_num] = true;
-                    if(iteration >= final) wait = true;
+                    if(iteration >= final) not_finished = false;
                 }
                 thread_num = (thread_num+1)%OMP_NUM_THREADS;
             }
         } break;
         case 2: {
             int iteration = inicio, thread_num = 0, i, tasknum = chunk_size;
-            not_finished = true; wait = false;
+            not_finished = true;
             bool check;
             for(int i = 0; i<OMP_NUM_THREADS; i++) {
                 int* num = (int *) malloc(sizeof(int));
@@ -134,16 +127,7 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                 task[i] = false;
             }
             while(not_finished) {
-                if(wait) {
-                    check = true;
-                    for(i = 0; i<OMP_NUM_THREADS; i++) {
-                        check = check && !task[i];
-                    }
-                    if(check) {
-                        not_finished = false;
-                    }
-                }
-                else if(!task[thread_num]) {
+                if(!task[thread_num]) {
                     tasknum = max<int>(ceil((double)(final-iteration)/(double)OMP_NUM_THREADS), chunk_size);
                     if(iteration+(tasknum*passo)-1 >= final) temp = final-1;
                     else temp = iteration+(tasknum*passo)-1;
@@ -151,7 +135,7 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                     iteration += tasknum*passo;
                     work[thread_num].push(parameters);
                     task[thread_num] = true;
-                    if(iteration >= final) wait = true;
+                    if(iteration >= final) not_finished = false;
                 }
                 thread_num = (thread_num+1)%OMP_NUM_THREADS;
             }
