@@ -39,6 +39,7 @@ void dsUnion(ii u, ii v){
     u = dsFind(u.first, u.second);
     v = dsFind(v.first, v.second);
 
+    //criterio arbitrário de união: O lider de cada conjunto é o que tem a maior distancia cartesiana da origem
     if((u.first*u.first + u.second*u.second) <  (v.first*v.first + v.second*v.second)){
         ii tmp = u;
         u = v;
@@ -199,7 +200,7 @@ int main(){
 
     for(t = 0; t < N; t++) pthread_join(list_threads[t], NULL);
 
-    // Repete o algoritmo percorrendo toda matriz realizando a união das fronteiras
+    // Repete o algoritmo percorrendo toda matriz realizando a união das fronteiras. Uma vez que o mapa converge para uma imagem só de lideres
     for (int x = 0; x < lim_x; x++){
         for (int y = 0; y < lim_y; y++){
             if(map_[x][y]){ //se for terra
