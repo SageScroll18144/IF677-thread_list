@@ -42,7 +42,7 @@ void* for_thread_static(void * var) {
 }
 
 void omp_for( int inicio , int passo , int final , int schedule , int chunk_size , void (*f)(int) ) {
-    int iteration = 0, thread_num = 0, error, temp;
+    int iteration = inicio, thread_num = 0, error, temp;
     pthread_t thread[OMP_NUM_THREADS];
     //inserindo as iteracoes a serem feitas por cada thread de acordo com o schedule
     switch(schedule) {
