@@ -43,8 +43,9 @@ void *primos(void *threadid){ //funcao das threads
 int main()
 {
     int nt, rc;
-    
+    printf("número de threads: ");
     scanf("%d", &nt); //numero de threads
+    printf("até que numero devemos analisar? ");
     scanf("%d", &N);  //até que numero vai a lista
     
     pthread_t threads[nt];
@@ -68,6 +69,7 @@ int main()
         pthread_join(threads[i], NULL);
     }
     
+    printf("primos:\n\n");
     
     for(int i=0; i<N; i++){//printa todos os primos
         if(array[i] == true){
