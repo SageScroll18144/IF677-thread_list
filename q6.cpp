@@ -193,6 +193,17 @@ int main() {
             omp_for(inicio, passo, final, schedule, chunk_size, funcao);
             cout << endl << "Digite 0 para sair do programa, 1 para criar um novo for e 2 para trocar a schedule(preservando as demais variaveis)" << endl;
             cin >> option;
+                while(option > 2 || option < 0) {
+                    cout << endl << "Opcao invalda" << endl;
+                    cout << endl << "Digite 0 para sair do programa, 1 para criar um novo for e 2 para trocar a schedule(preservando as demais variaveis)" << endl;
+                    
+                }
+        }
+        
+        while(option < 0 || option > 2) {
+            cout << endl << "Opcao invalda" << endl; 
+            cout << endl << "Digite 0 para sair do programa, 1 para criar um novo for e 2 para trocar a schedule(preservando as demais variaveis)" << endl;
+            cin >> option;
         }
         
     } while(option);
