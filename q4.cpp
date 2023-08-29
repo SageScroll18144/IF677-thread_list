@@ -209,7 +209,7 @@ int main(){
                     int ceil_adj_y = y + adj_y[adj]; 
 
                     if(ceil_adj_x >= 0 && ceil_adj_x <= lim_x && ceil_adj_y >= 0 && ceil_adj_y <= lim_y){
-                        if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
+                        if(map_[ceil_adj_x][ceil_adj_y] && dsFind(x, y) != dsFind(ceil_adj_x, ceil_adj_y)){//se for terra
                             dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
                         }
                     }
