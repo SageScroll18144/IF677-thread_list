@@ -95,7 +95,6 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                     cout << "Erro na criacao de thread";
                     exit(1);
                 }
-                access_to_task[i] = PTHREAD_MUTEX_INITIALIZER;
                 task[i] = false;
             }
             while(not_finished) {
@@ -132,7 +131,6 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                     cout << "Erro na criacao de thread";
                     exit(1);
                 }
-                access_to_task[i] = PTHREAD_MUTEX_INITIALIZER;
                 task[i] = false;
             }
             while(not_finished) {
