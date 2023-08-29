@@ -63,8 +63,8 @@ void *solve(void * args_){
                     int ceil_adj_x = x + adj_x[adj];
                     int ceil_adj_y = y + adj_y[adj]; 
 
-                    //além de realizar a união com os elementos pertencente ao campo, realiza támbem com a fronteira
-                    if(ceil_adj_x >= 0 && ceil_adj_x <= lim_sup_x && ceil_adj_y >= 0 && ceil_adj_y <= lim_sup_y){
+                    //além de realizar a união com os elementos pertencente ao campo
+                    if(ceil_adj_x >= lim_inf_x && ceil_adj_x <= lim_sup_x && ceil_adj_y >= lim_inf_y && ceil_adj_y <= lim_sup_y){
                         if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
                             dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
                         }
@@ -198,6 +198,25 @@ int main(){
     }
 
     for(t = 0; t < N; t++) pthread_join(list_threads[t], NULL);
+
+    // Repete o algoritmo percorrendo toda matriz realizando a união das fronteiras
+    for (int x = 0; x < lim_x; x++){
+        for (int y = 0; y < lim_y; y++){
+            if(map_[x][y]){ //se for terra
+                for(int adj = 0; adj < 8; adj++){
+                    int ceil_adj_x = x + adj_x[adj];
+                    int ceil_adj_y = y + adj_y[adj]; 
+
+                    if(ceil_adj_x >= 0 && ceil_adj_x <= lim_x && ceil_adj_y >= 0 && ceil_adj_y <= lim_y){
+                        if(map_[ceil_adj_x][ceil_adj_y]){//se for terra
+                            dsUnion({x,y}, {ceil_adj_x, ceil_adj_y});
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
 
     //Saida do programa
     printf("O seu mapa têm %d ilhas!\n", counter_fathers(0, 0, lim_x, lim_y));
