@@ -56,6 +56,9 @@ void* for_thread_dynamic(void * var) {
         }
     }
     free(var);
+    //pthread_mutex_lock(&write_on_screen);
+    //cout << "A thread " << thread_num << " foi encerrada" << endl;
+    //pthread_mutex_unlock(&write_on_screen);
     pthread_exit(NULL);
 }
 
@@ -104,6 +107,9 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                     if(iteration+(chunk_size*passo)-1 >= final) temp = final-1;
                     else temp = iteration+(chunk_size*passo)-1;
                     for_parameters parameters = {iteration, temp, passo, f};
+                    //pthread_mutex_lock(&write_on_screen);
+                    //cout << "Alocando " << chunk_size << " na thread " << thread_num << endl;
+                    //pthread_mutex_unlock(&write_on_screen);
                     iteration += chunk_size*passo;
                     work[thread_num].push(parameters);
                     task[thread_num] = true;
@@ -132,6 +138,9 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
                     if(iteration+(tasknum*passo)-1 >= final) temp = final-1;
                     else temp = iteration+(tasknum*passo)-1;
                     for_parameters parameters = {iteration, temp, passo, f};
+                    //pthread_mutex_lock(&write_on_screen);
+                    //cout << "Alocando " << chunk_size << " na thread " << thread_num << endl;
+                    //pthread_mutex_unlock(&write_on_screen);
                     iteration += tasknum*passo;
                     work[thread_num].push(parameters);
                     task[thread_num] = true;
@@ -141,6 +150,7 @@ void omp_for( int inicio , int passo , int final , int schedule , int chunk_size
             }
         } break;
     }
+    
     for(int i = 0; i<OMP_NUM_THREADS; i++) { // espera ate todas as iteracoes acabarem
         pthread_join(thread[i], NULL);
     }
@@ -156,7 +166,37 @@ int main() {
     {   
     f(i);
     }*/
-    int inicio = 0, passo = 1, final = 15, chunk_size = 2, schedule = 0; // schedule 0 = static, schedule 1 = dynamic, schedule 2 = guided
-    omp_for(inicio, passo, final, schedule, chunk_size, funcao);
+    int inicio, passo, final, chunk_size, schedule; // schedule 0 = static, schedule 1 = dynamic, schedule 2 = guided
+    int option;
+    
+    do {
+        cout << "Qual o valor do inicio do loop?" << endl;
+        cin >> inicio;
+        cout << "Qual o valor do fim do loop?" << endl;
+        cin >> final;
+        cout << "Qual o valor do passo do loop?" << endl;
+        cin >> passo;
+        cout << "Qual eh o chunk_size?" << endl;
+        cin >> chunk_size;
+        cout << "Qual a schedule desejada?(0 para static, 1 para dynamic e 2 para guided)" << endl;
+        cin >> schedule;
+        cout << endl;
+        
+        omp_for(inicio, passo, final, schedule, chunk_size, funcao);
+        
+        cout << endl << "Digite 0 para sair do programa, 1 para criar um novo for e 2 para trocar a schedule(preservando as demais variaveis)" << endl;
+        cin >> option;
+        while(option == 2) {
+            cout << "Qual a schedule desejada?(0 para static, 1 para dynamic e 2 para guided)" << endl;
+            cin >> schedule;
+            cout << endl;
+            omp_for(inicio, passo, final, schedule, chunk_size, funcao);
+            cout << endl << "Digite 0 para sair do programa, 1 para criar um novo for e 2 para trocar a schedule(preservando as demais variaveis)" << endl;
+            cin >> option;
+        }
+        
+    } while(option);
+    
+    
     return 0;
 }
